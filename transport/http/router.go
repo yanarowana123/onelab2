@@ -6,7 +6,7 @@ import (
 )
 
 func InitRouter(h handler.Manager) *mux.Router {
-	r := mux.NewRouter()
+	r := mux.NewRouter() // здесь лучше принимать экземпляр роутера твоего что бы была возможность его настраивать отдельно
 	r.HandleFunc("/user", h.LogMiddleware(h.CreateUser())).Methods("POST")
 	r.HandleFunc("/user/{userLogin}", h.LogMiddleware(h.GetUser())).Methods("GET")
 

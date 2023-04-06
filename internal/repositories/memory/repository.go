@@ -20,7 +20,6 @@ func NewMemoryUserRepository() *MemoryUserRepository {
 
 func (r *MemoryUserRepository) CreateUser(user models.CreateUserReq) (*models.UserResponse, error) {
 	userResponse := r.getUser(user.Login)
-
 	if userResponse != nil {
 		return userResponse, nil
 	}

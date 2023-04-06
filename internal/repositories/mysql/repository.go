@@ -9,6 +9,7 @@ type MysqlUserRepository struct {
 	db *sql.DB
 }
 
+// Если используешь ДБ то нужно сделать в отдельном файле функцию подключения
 func NewMysqlUserRepository(db *sql.DB) *MysqlUserRepository {
 	return &MysqlUserRepository{
 		db,

@@ -11,6 +11,7 @@ type UserResponse struct {
 	Login string
 }
 
+// мы не используем конструкторы для простых моделей
 func NewCreateUserReq(name, login, password string) *CreateUserReq {
 	//TODO ADD VALIDATION
 	return &CreateUserReq{

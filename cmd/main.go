@@ -31,15 +31,15 @@ func main() {
 	//userRepository := repository.NewMysqlUserRepository(db)
 
 	//in-memory
-	userRepository := repository.NewMemoryUserRepository()
+	userRepository := repository.NewMemoryUserRepository() // это должно быть внутри своего слоя
 	repositoryManager := repositories.NewManager(userRepository)
 
-	userService := services.NewUserService(*repositoryManager)
+	userService := services.NewUserService(*repositoryManager) // это должно быть внутри своего слоя
 	serviceManager := services.NewManager(userService)
 
 	handlerManager := handler.NewManager(*loggerManager, *serviceManager)
 
-	router := http.InitRouter(*handlerManager)
+	router := http.InitRouter(*handlerManager) // роутер можно вынести в слой транспорта
 
 	http.InitServer(*config, router)
 }
