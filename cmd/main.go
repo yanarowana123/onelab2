@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/gorilla/mux"
 	"github.com/subosito/gotenv"
 	"github.com/yanarowana123/onelab2/configs"
 	"github.com/yanarowana123/onelab2/internal/repositories"
-	"github.com/yanarowana123/onelab2/internal/repositories/memory"
 	"github.com/yanarowana123/onelab2/internal/services"
 	"github.com/yanarowana123/onelab2/pkg/logger"
 	"github.com/yanarowana123/onelab2/transport/http"
@@ -21,25 +21,19 @@ func main() {
 		panic(err)
 	}
 
-	config := configs.New()
-	//sql
-	//db, err := mysql.New(*config)
-	//defer db.Close()
-	//if err != nil {
-	//	panic(err)
-	//}
-	//userRepository := repository.NewMysqlUserRepository(db)
+	config, err := configs.New()
+	if err != nil {
+		panic(err)
+	}
 
-	//in-memory
-	userRepository := repository.NewMemoryUserRepository()
-	repositoryManager := repositories.NewManager(userRepository)
+	repositoryManager := repositories.NewManager(*config)
 
-	userService := services.NewUserService(*repositoryManager)
-	serviceManager := services.NewManager(userService)
+	serviceManager := services.NewManager(*repositoryManager, *config)
 
 	handlerManager := handler.NewManager(*loggerManager, *serviceManager)
 
-	router := http.InitRouter(*handlerManager)
+	r := mux.NewRouter()
+	router := http.InitRouter(r, *handlerManager)
 
 	http.InitServer(*config, router)
 }

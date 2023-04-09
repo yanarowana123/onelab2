@@ -1,0 +1,28 @@
+version: '3.5'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8081:${WEB_SERVER_PORT}"
+    networks: &networks
+      - default
+    env_file:
+      - env
+    depends_on:
+      - db
+
+
+  db:
+    image: postgres:13
+    networks: *networks
+    environment:
+      - POSTGRES_DB=${PGSQL_DB}
+      - POSTGRES_USER=${PGSQL_USER}
+      - POSTGRES_PASSWORD=${PGSQL_PASSWORD}
+
+
+networks:
+  default:
+    name: localnet
+    external: true
