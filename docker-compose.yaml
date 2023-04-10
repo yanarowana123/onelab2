@@ -1,28 +1,43 @@
-version: '3.5'
+version: "3.9"
+
+networks:
+  one_lab:
+    driver: bridge
+
+volumes:
+  api_data:
 
 services:
   app:
     build: .
     ports:
       - "8081:${WEB_SERVER_PORT}"
-    networks: &networks
-      - default
+    volumes:
+      - .:/src
     env_file:
-      - env
-    depends_on:
-      - db
-
-
-  db:
-    image: postgres:13
-    networks: *networks
+      - .env
     environment:
-      - POSTGRES_DB=${PGSQL_DB}
+      - TZ=Asia/Almaty
+    networks:
+      - one_lab
+    depends_on:
+      - postgres
+      - redis
+  postgres:
+    image: postgres:13.2-alpine
+    volumes:
+      - api_data:/var/lib/postgresql/data
+    environment:
       - POSTGRES_USER=${PGSQL_USER}
       - POSTGRES_PASSWORD=${PGSQL_PASSWORD}
-
-
-networks:
-  default:
-    name: localnet
-    external: true
+      - POSTGRES_DB=${PGSQL_DB}
+    networks:
+      - one_lab
+    ports:
+      - "5433:${PGSQL_PORT}"
+  redis:
+    image: redis:alpine
+    networks:
+      - one_lab
+    ports:
+      - "6379:6379"
