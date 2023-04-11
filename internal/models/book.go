@@ -9,13 +9,13 @@ import (
 type CreateBookRequest struct {
 	ID     uuid.UUID
 	Name   string
-	Author string
+	Author uuid.UUID
 }
 
 type BookResponse struct {
 	ID        uuid.UUID
 	Name      string
-	Author    string
+	Author    uuid.UUID
 	CreatedAt time.Time
 }
 
