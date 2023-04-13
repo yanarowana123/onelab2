@@ -20,7 +20,7 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 
 func (r *UserRepository) GetListWithBooksQuantity(ctx context.Context, page, pageSize int, dateFrom time.Time) (*models.UserWithBookQuantityList, error) {
 	offset := pageSize * (page - 1)
-	rows, err := r.db.QueryContext(ctx, "SELECT u.id, u.login, u.name, u.created_at, COUNT(c.user_id)  FROM users u LEFT JOIN check_out c ON u.id = c.user_id AND c.checked_out_at >= $1 GROUP BY u.id, u.name, u.login, u.id, u.created_at ORDER BY u.created_at OFFSET $2 LIMIT $3",
+	rows, err := r.db.QueryContext(ctx, "SELECT u.id, u.email, u.first_name, u.last_name, u.created_at, COUNT(c.user_id)  FROM users u LEFT JOIN check_out c ON u.id = c.user_id AND c.checked_out_at >= $1 GROUP BY u.id, u.first_name, u.email, u.id, u.last_name, u.created_at, u.id, u.created_at ORDER BY u.created_at OFFSET $2 LIMIT $3",
 		dateFrom, offset, pageSize)
 
 	if err != nil {
@@ -33,8 +33,9 @@ func (r *UserRepository) GetListWithBooksQuantity(ctx context.Context, page, pag
 		var userWithBookQuantity models.UserWithBookQuantity
 		err = rows.Scan(
 			&userWithBookQuantity.User.ID,
-			&userWithBookQuantity.User.Name,
-			&userWithBookQuantity.User.Login,
+			&userWithBookQuantity.User.Email,
+			&userWithBookQuantity.User.FirstName,
+			&userWithBookQuantity.User.LastName,
 			&userWithBookQuantity.User.CreatedAt,
 			&userWithBookQuantity.Books,
 		)
@@ -46,7 +47,7 @@ func (r *UserRepository) GetListWithBooksQuantity(ctx context.Context, page, pag
 
 func (r *UserRepository) GetListWithBooks(ctx context.Context, page, pageSize int) (*models.UserWithBookList, error) {
 	offset := pageSize * (page - 1)
-	rows, err := r.db.QueryContext(ctx, "SELECT u.id, u.login, u.name, u.created_at, b.id, b.name, b.author, b.created_at  FROM users u LEFT JOIN check_out c ON u.id = c.user_id AND c.returned_at IS NULL LEFT JOIN books b ON c.book_id = b.id ORDER BY u.created_at OFFSET $1 LIMIT $2",
+	rows, err := r.db.QueryContext(ctx, "SELECT u.id, u.email, u.first_name, u.last_name, u.created_at, b.id, b.name, b.author_id, b.created_at  FROM users u LEFT JOIN check_out c ON u.id = c.user_id AND c.returned_at IS NULL LEFT JOIN books b ON c.book_id = b.id ORDER BY u.created_at OFFSET $1 LIMIT $2",
 		offset, pageSize)
 
 	if err != nil {
@@ -65,12 +66,13 @@ func (r *UserRepository) GetListWithBooks(ctx context.Context, page, pageSize in
 		var book models.BookResponse
 		err = rows.Scan(
 			&user.ID,
-			&user.Name,
-			&user.Login,
+			&user.Email,
+			&user.FirstName,
+			&user.LastName,
 			&user.CreatedAt,
 			&nullableBook.ID,
 			&nullableBook.Name,
-			&nullableBook.Author,
+			&nullableBook.AuthorID,
 			&nullableBook.CreatedAt,
 		)
 		if err != nil {
@@ -80,7 +82,7 @@ func (r *UserRepository) GetListWithBooks(ctx context.Context, page, pageSize in
 		if nullableBook.ID.Valid {
 			book.ID, _ = uuid.Parse(nullableBook.ID.String)
 			book.Name = nullableBook.Name.String
-			book.Author = nullableBook.Author.String
+			book.AuthorID, _ = uuid.Parse(nullableBook.AuthorID.String)
 			book.CreatedAt = nullableBook.CreatedAt.Time
 			userBookMap[user] = append(userBookMap[user], book)
 		} else {
@@ -101,19 +103,19 @@ func (r *UserRepository) GetListWithBooks(ctx context.Context, page, pageSize in
 }
 
 func (r *UserRepository) Create(ctx context.Context, user models.CreateUserRequest) (*models.UserResponse, error) {
-	_, err := r.db.ExecContext(ctx, "insert into users (id, name, login, password) values ($1,$2,$3,$4)",
-		user.ID, user.Name, user.Login, user.Password)
+	_, err := r.db.ExecContext(ctx, "insert into users (id, email, first_name, last_name, password) values ($1,$2,$3,$4, $5)",
+		user.ID, user.Email, user.FirstName, user.LastName, user.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	return &models.UserResponse{ID: user.ID, Name: user.Name, Login: user.Login}, nil
+	return user.ToUserResponse(), nil
 }
 
 func (r *UserRepository) GetByID(ctx context.Context, ID uuid.UUID) (*models.UserResponse, error) {
 	var userResponse models.UserResponse
-	err := r.db.QueryRowContext(ctx, "SELECT id, login, name, created_at FROM users WHERE id=$1", ID).
-		Scan(&userResponse.ID, &userResponse.Login, &userResponse.Name, &userResponse.CreatedAt)
+	err := r.db.QueryRowContext(ctx, "SELECT id, email, first_name, last_name, created_at FROM users WHERE id=$1", ID).
+		Scan(&userResponse.ID, &userResponse.Email, &userResponse.FirstName, &userResponse.LastName, &userResponse.CreatedAt)
 
 	if err != nil {
 		return nil, err
@@ -124,7 +126,7 @@ func (r *UserRepository) GetByID(ctx context.Context, ID uuid.UUID) (*models.Use
 
 func (r *UserRepository) GetByLogin(ctx context.Context, login string) (*models.AuthUser, error) {
 	var userResponse models.AuthUser
-	err := r.db.QueryRowContext(ctx, "SELECT id, login, password FROM users WHERE login=$1", login).Scan(&userResponse.ID, &userResponse.Login, &userResponse.Password)
+	err := r.db.QueryRowContext(ctx, "SELECT id, email, password FROM users WHERE email=$1", login).Scan(&userResponse.ID, &userResponse.Email, &userResponse.Password)
 
 	if err != nil {
 		return nil, err

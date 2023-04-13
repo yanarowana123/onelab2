@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"fmt"
+	"encoding/json"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/yanarowana123/onelab2/internal/models"
@@ -16,12 +16,20 @@ func (h *Manager) CheckOut() http.HandlerFunc {
 		params := mux.Vars(r)
 		bookID, err := uuid.Parse(params["bookID"])
 		createCheckOutRequest.BookID = bookID
-		fmt.Println(r.Context().Value("userID"))
 		createCheckOutRequest.UserID = r.Context().Value("userID").(uuid.UUID)
+
+		err = h.validate.Struct(createCheckOutRequest)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			errors := models.NewErrorsCustomFromValidationErrors(err)
+			json.NewEncoder(w).Encode(errors)
+			return
+		}
 
 		err = h.service.CheckOut.CheckOut(r.Context(), createCheckOutRequest)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(models.ErrorCustom{Msg: err.Error()})
 			return
 		}
 
@@ -39,9 +47,18 @@ func (h *Manager) Return() http.HandlerFunc {
 		createCheckOutRequest.BookID = bookID
 		createCheckOutRequest.UserID = r.Context().Value("userID").(uuid.UUID)
 
+		err = h.validate.Struct(createCheckOutRequest)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			errors := models.NewErrorsCustomFromValidationErrors(err)
+			json.NewEncoder(w).Encode(errors)
+			return
+		}
+
 		err = h.service.CheckOut.Return(r.Context(), createCheckOutRequest)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(models.ErrorCustom{Msg: err.Error()})
 			return
 		}
 

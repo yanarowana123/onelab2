@@ -2,7 +2,9 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/yanarowana123/onelab2/internal/models"
 	"net/http"
 	"strconv"
 	"strings"
@@ -10,16 +12,14 @@ import (
 
 func (h *Manager) LogMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		//reqBody, _ := ioutil.ReadAll(r.Body)
-		//
-		//h.logger.InfoLogger.Printf("%s %q", r.Method, html.EscapeString(r.URL.Path))
-		//h.logger.InfoLogger.Printf("Request body:%s", reqBody)
 		next.ServeHTTP(w, r)
 	}
 }
 
 func (h *Manager) TokenValidateMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
 		authHeader := r.Header.Get("Authorization")
 		bearerToken := strings.Split(authHeader, " ")
 
@@ -27,27 +27,41 @@ func (h *Manager) TokenValidateMiddleware(next http.HandlerFunc) http.HandlerFun
 			authToken := bearerToken[1]
 			token, err := jwt.Parse(authToken, func(token *jwt.Token) (interface{}, error) {
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-					http.Error(w, "Unauthorized", http.StatusUnauthorized)
+					w.WriteHeader(http.StatusUnauthorized)
+					json.NewEncoder(w).Encode(models.ErrorCustom{Msg: "Unauthorized"})
 				}
 
 				return []byte(h.service.Auth.GetAccessTokenSecret()), nil
 			})
 
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusUnauthorized)
+				w.WriteHeader(http.StatusUnauthorized)
+				json.NewEncoder(w).Encode(models.ErrorCustom{Msg: err.Error()})
 				return
 			}
 
 			if token.Valid {
-				ctx := context.WithValue(r.Context(), "userID", h.service.Auth.GetUserID(token))
+				userId := h.service.Auth.GetUserID(token)
+				_, err = h.service.User.GetByID(r.Context(), userId)
+
+				if err != nil {
+					w.WriteHeader(http.StatusUnauthorized)
+					json.NewEncoder(w).Encode(models.ErrorCustom{Msg: "Unauthorized"})
+					return
+				}
+
+				ctx := context.WithValue(r.Context(), "userID", userId)
 				next.ServeHTTP(w, r.WithContext(ctx))
 				return
 			} else {
-				http.Error(w, err.Error(), http.StatusUnauthorized)
+				w.WriteHeader(http.StatusUnauthorized)
+				json.NewEncoder(w).Encode(models.ErrorCustom{Msg: err.Error()})
 				return
 			}
 		}
-		http.Error(w, "Invalid Token", http.StatusUnauthorized)
+
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(models.ErrorCustom{Msg: "Invalid Token"})
 		return
 	}
 }

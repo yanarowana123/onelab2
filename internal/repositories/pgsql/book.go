@@ -18,19 +18,19 @@ func NewBookRepository(db *sql.DB) *BookRepository {
 }
 
 func (r BookRepository) Create(ctx context.Context, book models.CreateBookRequest) (*models.BookResponse, error) {
-	_, err := r.db.ExecContext(ctx, "insert into books (id, name, author) values ($1,$2,$3)",
-		book.ID, book.Name, book.Author)
+	_, err := r.db.ExecContext(ctx, "insert into books (id, name, author_id) values ($1,$2,$3)",
+		book.ID, book.Name, book.AuthorID)
 	if err != nil {
 		return nil, err
 	}
 
-	return &models.BookResponse{ID: book.ID, Name: book.Name, Author: book.Author}, nil
+	return book.ToBookResponse(), nil
 }
 
 func (r BookRepository) GetByID(ctx context.Context, ID uuid.UUID) (*models.BookResponse, error) {
 	var bookResponse models.BookResponse
-	err := r.db.QueryRowContext(ctx, "SELECT id, name,author, created_at FROM books WHERE id=$1", ID).
-		Scan(&bookResponse.ID, &bookResponse.Name, &bookResponse.Author, &bookResponse.CreatedAt)
+	err := r.db.QueryRowContext(ctx, "SELECT id, name,author_id, created_at FROM books WHERE id=$1", ID).
+		Scan(&bookResponse.ID, &bookResponse.Name, &bookResponse.AuthorID, &bookResponse.CreatedAt)
 
 	if err != nil {
 		return nil, err
