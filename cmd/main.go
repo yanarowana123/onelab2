@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 	"github.com/subosito/gotenv"
 	"github.com/yanarowana123/onelab2/configs"
@@ -20,11 +21,13 @@ func main() {
 		panic(err)
 	}
 
+	validate := validator.New()
+
 	repositoryManager := repositories.NewManager(*config)
 
 	serviceManager := services.NewManager(*repositoryManager, *config)
 
-	handlerManager := handler.NewManager(*serviceManager)
+	handlerManager := handler.NewManager(*serviceManager, validate)
 
 	r := mux.NewRouter()
 	router := http.InitRouter(r, *handlerManager)

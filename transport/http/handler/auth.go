@@ -12,25 +12,41 @@ func (h *Manager) Login() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		var userAttempting models.AuthUser
-		json.NewDecoder(r.Body).Decode(&userAttempting)
+		err := json.NewDecoder(r.Body).Decode(&userAttempting)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(models.ErrorCustom{Msg: err.Error()})
+			return
+		}
 
-		user, err := h.service.User.GetByLogin(r.Context(), userAttempting.Login)
+		err = h.validate.Struct(userAttempting)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			errors := models.NewErrorsCustomFromValidationErrors(err)
+			json.NewEncoder(w).Encode(errors)
+			return
+		}
+
+		user, err := h.service.User.GetByLogin(r.Context(), userAttempting.Email)
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusUnauthorized)
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(models.ErrorCustom{Msg: err.Error()})
 			return
 		}
 
 		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userAttempting.Password))
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusUnauthorized)
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(models.ErrorCustom{Msg: err.Error()})
 			return
 		}
 		tokenPair, err := h.service.Auth.GenerateTokenPair(*user)
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(models.ErrorCustom{Msg: err.Error()})
 			return
 		}
 
@@ -71,7 +87,7 @@ func (h *Manager) RefreshToken() http.HandlerFunc {
 			}
 
 			//TODO add  UserResponse to AuthUser mapper function
-			tokenPair, err := h.service.Auth.GenerateTokenPair(models.AuthUser{ID: userID, Login: user.Login})
+			tokenPair, err := h.service.Auth.GenerateTokenPair(models.AuthUser{ID: userID, Email: user.Email})
 
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
