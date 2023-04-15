@@ -13,9 +13,10 @@ type Manager struct {
 }
 
 func NewManager(repository repositories.Manager, config configs.Config) *Manager {
-	userService := NewUserService(repository)
-	bookService := NewBookService(repository)
-	authService := NewAuthService(config.JWTAccessTokenSecret, config.JWTRefreshTokenSecret)
+	utilsService := &UtilsService{}
+	userService := NewUserService(repository, utilsService)
+	bookService := NewBookService(repository, utilsService)
+	authService := NewAuthService(config.JWTAccessTokenSecret, config.JWTRefreshTokenSecret, config.JWTAccessTokenTTL, config.JWTRefreshTokenTTL)
 	checkOutService := NewCheckOutService(repository)
 	return &Manager{User: userService, Book: bookService, Auth: authService, CheckOut: checkOutService}
 }

@@ -24,6 +24,7 @@ type IBookRepository interface {
 type ICheckOutRepository interface {
 	CheckOut(ctx context.Context, checkOut models.CreateCheckOutRequest) error
 	Return(ctx context.Context, checkOut models.CreateCheckOutRequest) error
+	HasUserReturnedBook(ctx context.Context, checkOut models.CreateCheckOutRequest) bool
 }
 
 type Manager struct {

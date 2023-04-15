@@ -5,7 +5,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/yanarowana123/onelab2/internal/models"
 	"github.com/yanarowana123/onelab2/internal/repositories"
-	"golang.org/x/crypto/bcrypt"
 	"time"
 )
 
@@ -19,11 +18,13 @@ type IUserService interface {
 
 type UserService struct {
 	repository repositories.Manager
+	utils      IUtilsService
 }
 
-func NewUserService(repository repositories.Manager) *UserService {
+func NewUserService(repository repositories.Manager, utils IUtilsService) *UserService {
 	return &UserService{
 		repository: repository,
+		utils:      utils,
 	}
 }
 
@@ -36,12 +37,13 @@ func (s *UserService) GetListWithBooks(ctx context.Context, page, pageSize int) 
 }
 
 func (s *UserService) Create(ctx context.Context, user models.CreateUserRequest) (*models.UserResponse, error) {
-	user.ID = uuid.New()
+	user.ID = s.utils.GenerateID()
 
-	bytes, err := bcrypt.GenerateFromPassword([]byte(user.Password), 14)
+	bytes, err := s.utils.HashPassword(user.Password)
 	if err != nil {
 		return nil, err
 	}
+
 	user.Password = string(bytes)
 	return s.repository.User.Create(ctx, user)
 }

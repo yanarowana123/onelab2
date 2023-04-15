@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func (h *Manager) CreateUser() http.HandlerFunc {
+func (h *Manager) Register() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 

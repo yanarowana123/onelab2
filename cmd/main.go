@@ -9,16 +9,24 @@ import (
 	"github.com/yanarowana123/onelab2/internal/services"
 	"github.com/yanarowana123/onelab2/transport/http"
 	"github.com/yanarowana123/onelab2/transport/http/handler"
+	"log"
 )
 
-func init() {
-	gotenv.Load()
+func main() {
+	if err := run(); err != nil {
+		log.Fatal(err.Error())
+	}
 }
 
-func main() {
+func run() error {
+	err := gotenv.Load()
+	if err != nil {
+		return err
+	}
+
 	config, err := configs.New()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	validate := validator.New()
@@ -33,4 +41,5 @@ func main() {
 	router := http.InitRouter(r, *handlerManager)
 
 	http.InitServer(*config, router)
+	return nil
 }

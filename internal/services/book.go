@@ -14,16 +14,18 @@ type IBookService interface {
 
 type BookService struct {
 	repository repositories.Manager
+	utils      IUtilsService
 }
 
-func NewBookService(repository repositories.Manager) *BookService {
+func NewBookService(repository repositories.Manager, utils IUtilsService) *BookService {
 	return &BookService{
 		repository: repository,
+		utils:      utils,
 	}
 }
 
 func (s *BookService) Create(ctx context.Context, book models.CreateBookRequest) (*models.BookResponse, error) {
-	book.ID = uuid.New()
+	book.ID = s.utils.GenerateID()
 	return s.repository.Book.Create(ctx, book)
 }
 

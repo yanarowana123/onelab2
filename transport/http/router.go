@@ -6,7 +6,7 @@ import (
 )
 
 func InitRouter(r *mux.Router, h handler.Manager) *mux.Router {
-	r.HandleFunc("/signup", h.LogMiddleware(h.CreateUser())).Methods("POST")
+	r.HandleFunc("/signup", h.LogMiddleware(h.Register())).Methods("POST")
 	r.HandleFunc("/login", h.LogMiddleware(h.Login())).Methods("POST")
 	r.HandleFunc("/refresh", h.RefreshToken()).Methods("POST")
 
