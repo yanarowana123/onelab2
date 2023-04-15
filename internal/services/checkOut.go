@@ -17,10 +17,6 @@ type CheckOutService struct {
 	repository repositories.Manager
 }
 
-func (s *CheckOutService) HasUserReturnedBook(ctx context.Context, checkOut models.CreateCheckOutRequest) bool {
-	return s.repository.CheckOut.HasUserReturnedBook(ctx, checkOut)
-}
-
 func NewCheckOutService(repository repositories.Manager) *CheckOutService {
 	return &CheckOutService{
 		repository: repository,
@@ -28,12 +24,17 @@ func NewCheckOutService(repository repositories.Manager) *CheckOutService {
 }
 
 func (s *CheckOutService) CheckOut(ctx context.Context, checkOut models.CreateCheckOutRequest) error {
-	if s.HasUserReturnedBook(ctx, checkOut) != false {
-		return errors.New("you already have checked out this book")
+	if s.HasUserReturnedBook(ctx, checkOut) {
+		return s.repository.CheckOut.CheckOut(ctx, checkOut)
 	}
-	return s.repository.CheckOut.CheckOut(ctx, checkOut)
+
+	return errors.New("you already have checked out this book")
 }
 
 func (s *CheckOutService) Return(ctx context.Context, checkOut models.CreateCheckOutRequest) error {
 	return s.repository.CheckOut.Return(ctx, checkOut)
+}
+
+func (s *CheckOutService) HasUserReturnedBook(ctx context.Context, checkOut models.CreateCheckOutRequest) bool {
+	return s.repository.CheckOut.HasUserReturnedBook(ctx, checkOut)
 }

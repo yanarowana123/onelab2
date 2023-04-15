@@ -202,6 +202,20 @@ func (mr *MockICheckOutRepositoryMockRecorder) CheckOut(ctx, checkOut interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckOut", reflect.TypeOf((*MockICheckOutRepository)(nil).CheckOut), ctx, checkOut)
 }
 
+// HasUserReturnedBook mocks base method.
+func (m *MockICheckOutRepository) HasUserReturnedBook(ctx context.Context, checkOut models.CreateCheckOutRequest) bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HasUserReturnedBook", ctx, checkOut)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// HasUserReturnedBook indicates an expected call of HasUserReturnedBook.
+func (mr *MockICheckOutRepositoryMockRecorder) HasUserReturnedBook(ctx, checkOut interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HasUserReturnedBook", reflect.TypeOf((*MockICheckOutRepository)(nil).HasUserReturnedBook), ctx, checkOut)
+}
+
 // Return mocks base method.
 func (m *MockICheckOutRepository) Return(ctx context.Context, checkOut models.CreateCheckOutRequest) error {
 	m.ctrl.T.Helper()

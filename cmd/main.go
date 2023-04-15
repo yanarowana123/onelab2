@@ -13,17 +13,13 @@ import (
 )
 
 func main() {
+	gotenv.Load()
 	if err := run(); err != nil {
 		log.Fatal(err.Error())
 	}
 }
 
 func run() error {
-	err := gotenv.Load()
-	if err != nil {
-		return err
-	}
-
 	config, err := configs.New()
 	if err != nil {
 		return err
