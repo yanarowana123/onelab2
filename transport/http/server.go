@@ -15,15 +15,11 @@ import (
 
 func InitServer(config configs.Config, r *mux.Router) {
 	var wait time.Duration
-	flag.DurationVar(&wait, "graceful-timeout", time.Second*15, "the duration for which the server gracefully wait for existing connections to finish - e.g. 15s or 1m")
+	flag.DurationVar(&wait, "graceful-timeout", config.GracefulTimeout, "the duration for which the server gracefully wait for existing connections to finish - e.g. 15s or 1m")
 	flag.Parse()
 	srv := &http.Server{
-		Addr: fmt.Sprintf("0.0.0.0:%s", config.WebServerPort),
-		// Good practice to set timeouts to avoid Slowloris attacks.
-		WriteTimeout: time.Second * 10,
-		ReadTimeout:  time.Second * 10,
-		IdleTimeout:  time.Second * 10,
-		Handler:      r, // Pass our instance of gorilla/mux in.
+		Addr:    fmt.Sprintf("0.0.0.0:%s", config.WebServerPort),
+		Handler: r, // Pass our instance of gorilla/mux in.
 	}
 
 	// Run our server in a goroutine so that it doesn't block.

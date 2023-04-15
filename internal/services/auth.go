@@ -15,22 +15,24 @@ type IAuthService interface {
 }
 
 type AuthService struct {
-	accessTokenSecret  string
-	refreshTokenSecret string
+	accessTokenSecret    string
+	refreshTokenSecret   string
+	accessTokenLifetime  time.Duration
+	refreshTokenLifetime time.Duration
 }
 
-func NewAuthService(accessTokenSecret, refreshTokenSecret string) *AuthService {
+func NewAuthService(accessTokenSecret, refreshTokenSecret string, accessTokenLifetime, refreshTokenLifetime time.Duration) *AuthService {
 	return &AuthService{
-		accessTokenSecret:  accessTokenSecret,
-		refreshTokenSecret: refreshTokenSecret,
+		accessTokenSecret:    accessTokenSecret,
+		refreshTokenSecret:   refreshTokenSecret,
+		accessTokenLifetime:  accessTokenLifetime,
+		refreshTokenLifetime: refreshTokenLifetime,
 	}
 }
 
 func (s *AuthService) GenerateTokenPair(user models.AuthUser) (map[string]string, error) {
-
-	//TODO read ExpiresAt from config
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"ExpiresAt": time.Now().Add(10 * time.Minute),
+		"ExpiresAt": time.Now().Add(s.accessTokenLifetime),
 		"id":        user.ID,
 	})
 
@@ -40,9 +42,8 @@ func (s *AuthService) GenerateTokenPair(user models.AuthUser) (map[string]string
 		return nil, err
 	}
 
-	//TODO read ExpiresAt from config
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"ExpiresAt": time.Now().Add(24 * time.Hour),
+		"ExpiresAt": time.Now().Add(s.refreshTokenLifetime),
 		"id":        user.ID,
 	})
 

@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
+	"time"
 )
 
 type Config struct {
@@ -12,6 +14,9 @@ type Config struct {
 	WebServerPort         string
 	JWTAccessTokenSecret  string
 	JWTRefreshTokenSecret string
+	JWTAccessTokenTTL     time.Duration
+	JWTRefreshTokenTTL    time.Duration
+	GracefulTimeout       time.Duration
 }
 
 func New() (*Config, error) {
@@ -67,11 +72,32 @@ func New() (*Config, error) {
 		return nil, errors.New("please specify JWT_REFRESH_TOKEN_SECRET variable in env")
 	}
 
+	jwtAccessTokenTTLString := os.Getenv("JWT_ACCESS_TOKEN_TTL")
+	jwtAccessTokenTTL, _ := strconv.Atoi(jwtAccessTokenTTLString)
+	if jwtAccessTokenTTL == 0 {
+		jwtAccessTokenTTL = 100
+	}
+
+	jwtRefreshTokenTTLString := os.Getenv("JWT_REFRESH_TOKEN_TTL")
+	jwtRefreshTokenTTL, _ := strconv.Atoi(jwtRefreshTokenTTLString)
+	if jwtRefreshTokenTTL == 0 {
+		jwtRefreshTokenTTL = 1000
+	}
+
+	GracefulTimeOutString := os.Getenv("GRACEFUL_TIMEOUT")
+	GracefulTimeOut, _ := strconv.Atoi(GracefulTimeOutString)
+	if GracefulTimeOut == 0 {
+		GracefulTimeOut = 15
+	}
+
 	return &Config{
 		MySqlDSN:              mySqlDSN,
 		PgSqlDSN:              pgSqlDSN,
 		WebServerPort:         webServerPort,
 		JWTAccessTokenSecret:  jwtAccessTokenSecret,
 		JWTRefreshTokenSecret: jwtRefreshTokenSecret,
+		JWTAccessTokenTTL:     time.Duration(jwtAccessTokenTTL) * time.Second,
+		JWTRefreshTokenTTL:    time.Duration(jwtRefreshTokenTTL) * time.Second,
+		GracefulTimeout:       time.Duration(GracefulTimeOut) * time.Second,
 	}, nil
 }
