@@ -6,11 +6,11 @@ import (
 )
 
 type CreateUserRequest struct {
-	ID        uuid.UUID
-	FirstName string `validate:"required" json:"first_name"`
-	LastName  string `validate:"required" json:"last_name"`
-	Email     string `validate:"required,email" json:"email"`
-	Password  string `validate:"required" json:"password"`
+	ID        uuid.UUID `json:"-"`
+	FirstName string    `validate:"required" json:"first_name"`
+	LastName  string    `validate:"required" json:"last_name"`
+	Email     string    `validate:"required,email" json:"email"`
+	Password  string    `validate:"required" json:"password"`
 }
 
 type UserResponse struct {
@@ -26,9 +26,9 @@ func (m *CreateUserRequest) ToUserResponse() *UserResponse {
 }
 
 type AuthUser struct {
-	ID       uuid.UUID
-	Email    string `validate:"required,email" json:"email"`
-	Password string `validate:"required" json:"password"`
+	ID       uuid.UUID `json:"-"`
+	Email    string    `validate:"required,email" json:"email"`
+	Password string    `validate:"required" json:"password"`
 }
 
 type UserWithBook struct {

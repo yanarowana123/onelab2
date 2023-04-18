@@ -42,14 +42,6 @@ func (h *Manager) TokenValidateMiddleware(next http.HandlerFunc) http.HandlerFun
 
 			if token.Valid {
 				userId := h.service.Auth.GetUserID(token)
-				_, err = h.service.User.GetByID(r.Context(), userId)
-
-				if err != nil {
-					w.WriteHeader(http.StatusUnauthorized)
-					json.NewEncoder(w).Encode(models.ErrorCustom{Msg: "Unauthorized"})
-					return
-				}
-
 				ctx := context.WithValue(r.Context(), "userID", userId)
 				next.ServeHTTP(w, r.WithContext(ctx))
 				return

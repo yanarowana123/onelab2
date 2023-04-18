@@ -3,6 +3,7 @@ package pgsql
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"github.com/google/uuid"
 	"github.com/yanarowana123/onelab2/internal/models"
 )
@@ -33,6 +34,10 @@ func (r BookRepository) GetByID(ctx context.Context, ID uuid.UUID) (*models.Book
 		Scan(&bookResponse.ID, &bookResponse.Name, &bookResponse.AuthorID, &bookResponse.CreatedAt)
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("book not found")
+		}
+
 		return nil, err
 	}
 

@@ -3,6 +3,7 @@ package pgsql
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"github.com/google/uuid"
 	"github.com/yanarowana123/onelab2/internal/models"
 	"time"
@@ -118,6 +119,9 @@ func (r *UserRepository) GetByID(ctx context.Context, ID uuid.UUID) (*models.Use
 		Scan(&userResponse.ID, &userResponse.Email, &userResponse.FirstName, &userResponse.LastName, &userResponse.CreatedAt)
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("user not found")
+		}
 		return nil, err
 	}
 
@@ -129,6 +133,9 @@ func (r *UserRepository) GetByLogin(ctx context.Context, login string) (*models.
 	err := r.db.QueryRowContext(ctx, "SELECT id, email, password FROM users WHERE email=$1", login).Scan(&userResponse.ID, &userResponse.Email, &userResponse.Password)
 
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("user not found")
+		}
 		return nil, err
 	}
 

@@ -8,7 +8,7 @@ import (
 )
 
 type IAuthService interface {
-	GenerateTokenPair(user models.AuthUser) (map[string]string, error)
+	GenerateTokenPair(user models.AuthUser) (*models.Tokens, error)
 	GetUserID(token *jwt.Token) uuid.UUID
 	GetAccessTokenSecret() string
 	GetRefreshTokenSecret() string
@@ -30,7 +30,7 @@ func NewAuthService(accessTokenSecret, refreshTokenSecret string, accessTokenLif
 	}
 }
 
-func (s *AuthService) GenerateTokenPair(user models.AuthUser) (map[string]string, error) {
+func (s *AuthService) GenerateTokenPair(user models.AuthUser) (*models.Tokens, error) {
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"ExpiresAt": time.Now().Add(s.accessTokenLifetime),
 		"id":        user.ID,
@@ -53,9 +53,9 @@ func (s *AuthService) GenerateTokenPair(user models.AuthUser) (map[string]string
 		return nil, err
 	}
 
-	return map[string]string{
-		"accessToken":  accessTokenString,
-		"refreshToken": refreshTokenString,
+	return &models.Tokens{
+		AccessToken:  accessTokenString,
+		RefreshToken: refreshTokenString,
 	}, nil
 }
 

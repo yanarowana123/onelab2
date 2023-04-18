@@ -4,44 +4,20 @@ import (
 	"encoding/json"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
-	"github.com/yanarowana123/onelab2/internal/models"
+	_ "github.com/yanarowana123/onelab2/internal/models"
 	"net/http"
 	"time"
 )
 
-func (h *Manager) Register() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-
-		var createUserReq models.CreateUserRequest
-		err := json.NewDecoder(r.Body).Decode(&createUserReq)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(models.ErrorCustom{Msg: err.Error()})
-			return
-		}
-
-		err = h.validate.Struct(createUserReq)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			errors := models.NewErrorsCustomFromValidationErrors(err)
-			json.NewEncoder(w).Encode(errors)
-			return
-		}
-
-		ctx := r.Context()
-		userResp, err := h.service.User.Create(ctx, createUserReq)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(models.ErrorCustom{Msg: err.Error()})
-			return
-		}
-
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(userResp)
-	}
-}
-
+// GetUserByID
+// @Summary get user by id
+// @Description get user by id
+// @Tags user
+// @Param userID path string true "User ID (UUID format)"
+// @Security ApiKeyAuth
+// @Success 200 {object} models.UserResponse
+// @Failure 404 "user not found"
+// @Router /user/{userID} [get]
 func (h *Manager) GetUserByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -50,15 +26,13 @@ func (h *Manager) GetUserByID() http.HandlerFunc {
 		userID, err := uuid.Parse(params["userID"])
 
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(models.ErrorCustom{Msg: err.Error()})
+			h.respondWithError(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		userResponse, err := h.service.User.GetByID(r.Context(), userID)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(models.ErrorCustom{Msg: err.Error()})
+			h.respondWithError(w, http.StatusNotFound, err.Error())
 			return
 		}
 
@@ -66,6 +40,15 @@ func (h *Manager) GetUserByID() http.HandlerFunc {
 	}
 }
 
+// GetUserListWithBooks
+// @Summary get user list with books
+// @Description get user list with books
+// @Tags user
+// @Param page query int false "page (pagination)"
+// @Param pageSize query int false "page size (pagination)"
+// @Security ApiKeyAuth
+// @Success 200 {object} models.UserWithBookList
+// @Router /users/books [get]
 func (h *Manager) GetUserListWithBooks() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -74,8 +57,7 @@ func (h *Manager) GetUserListWithBooks() http.HandlerFunc {
 		pageSize := r.Context().Value("pageSize").(int)
 		userListWithBooks, err := h.service.User.GetListWithBooks(r.Context(), page, pageSize)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(models.ErrorCustom{Msg: err.Error()})
+			h.respondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
@@ -83,6 +65,15 @@ func (h *Manager) GetUserListWithBooks() http.HandlerFunc {
 	}
 }
 
+// GetUserListWithBooksQuantity
+// @Summary get user list with books quantity they have at the moment
+// @Description get user list with books quantity
+// @Tags user
+// @Param page query int false "page (pagination)"
+// @Param pageSize query int false "page size (pagination)"
+// @Security ApiKeyAuth
+// @Success 200 {object} models.UserWithBookQuantityList
+// @Router /users/book-quantity [get]
 func (h *Manager) GetUserListWithBooksQuantity() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -94,8 +85,7 @@ func (h *Manager) GetUserListWithBooksQuantity() http.HandlerFunc {
 		userListWithBooks, err := h.service.User.GetListWithBooksQuantity(r.Context(), page, pageSize, dateFrom)
 
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(models.ErrorCustom{Msg: err.Error()})
+			h.respondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 

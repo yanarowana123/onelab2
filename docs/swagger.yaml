@@ -1,0 +1,284 @@
+definitions:
+  github_com_yanarowana123_onelab2_internal_models.AuthUser:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  github_com_yanarowana123_onelab2_internal_models.BookResponse:
+    properties:
+      author_id:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  github_com_yanarowana123_onelab2_internal_models.CreateBookRequest:
+    properties:
+      author_id:
+        type: string
+      name:
+        type: string
+    required:
+    - author_id
+    - name
+    type: object
+  github_com_yanarowana123_onelab2_internal_models.CreateUserRequest:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    type: object
+  github_com_yanarowana123_onelab2_internal_models.Tokens:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  github_com_yanarowana123_onelab2_internal_models.UserResponse:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+    type: object
+  github_com_yanarowana123_onelab2_internal_models.UserWithBook:
+    properties:
+      books:
+        items:
+          $ref: '#/definitions/github_com_yanarowana123_onelab2_internal_models.BookResponse'
+        type: array
+      user:
+        $ref: '#/definitions/github_com_yanarowana123_onelab2_internal_models.UserResponse'
+    type: object
+  github_com_yanarowana123_onelab2_internal_models.UserWithBookList:
+    properties:
+      users:
+        items:
+          $ref: '#/definitions/github_com_yanarowana123_onelab2_internal_models.UserWithBook'
+        type: array
+    type: object
+  github_com_yanarowana123_onelab2_internal_models.UserWithBookQuantity:
+    properties:
+      books:
+        type: integer
+      user:
+        $ref: '#/definitions/github_com_yanarowana123_onelab2_internal_models.UserResponse'
+    type: object
+  github_com_yanarowana123_onelab2_internal_models.UserWithBookQuantityList:
+    properties:
+      users:
+        items:
+          $ref: '#/definitions/github_com_yanarowana123_onelab2_internal_models.UserWithBookQuantity'
+        type: array
+    type: object
+info:
+  contact: {}
+paths:
+  /book:
+    post:
+      description: create book
+      parameters:
+      - description: body
+        in: body
+        name: book
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_yanarowana123_onelab2_internal_models.CreateBookRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_yanarowana123_onelab2_internal_models.BookResponse'
+      summary: create book
+      tags:
+      - book
+  /book/{bookID}:
+    get:
+      description: get book by id
+      parameters:
+      - description: Book ID (UUID format)
+        in: path
+        name: bookID
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_yanarowana123_onelab2_internal_models.BookResponse'
+        "404":
+          description: book not found
+      security:
+      - ApiKeyAuth: []
+      summary: get book by id
+      tags:
+      - book
+  /checkout/{bookID}:
+    post:
+      description: checkout book
+      parameters:
+      - description: Book ID (UUID format)
+        in: path
+        name: bookID
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: you already have checked out this book
+        "404":
+          description: book not found
+      security:
+      - ApiKeyAuth: []
+      summary: checkout book
+      tags:
+      - checkOut
+  /login:
+    post:
+      description: log-in to system
+      parameters:
+      - description: body
+        in: body
+        name: auth
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_yanarowana123_onelab2_internal_models.AuthUser'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_yanarowana123_onelab2_internal_models.Tokens'
+      summary: log-in to system
+      tags:
+      - auth
+  /return/{bookID}:
+    post:
+      description: return book
+      parameters:
+      - description: Book ID (UUID format)
+        in: path
+        name: bookID
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: book not found
+      security:
+      - ApiKeyAuth: []
+      summary: return book
+      tags:
+      - checkOut
+  /signup:
+    post:
+      description: Registration
+      parameters:
+      - description: body
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_yanarowana123_onelab2_internal_models.CreateUserRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_yanarowana123_onelab2_internal_models.UserResponse'
+        "400":
+          description: validation error
+      summary: Registration
+      tags:
+      - auth
+  /user/{userID}:
+    get:
+      description: get user by id
+      parameters:
+      - description: User ID (UUID format)
+        in: path
+        name: userID
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_yanarowana123_onelab2_internal_models.UserResponse'
+        "404":
+          description: user not found
+      security:
+      - ApiKeyAuth: []
+      summary: get user by id
+      tags:
+      - user
+  /users/book-quantity:
+    get:
+      description: get user list with books quantity
+      parameters:
+      - description: page (pagination)
+        in: query
+        name: page
+        type: integer
+      - description: page size (pagination)
+        in: query
+        name: pageSize
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_yanarowana123_onelab2_internal_models.UserWithBookQuantityList'
+      security:
+      - ApiKeyAuth: []
+      summary: get user list with books quantity they have at the moment
+      tags:
+      - user
+  /users/books:
+    get:
+      description: get user list with books
+      parameters:
+      - description: page (pagination)
+        in: query
+        name: page
+        type: integer
+      - description: page size (pagination)
+        in: query
+        name: pageSize
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_yanarowana123_onelab2_internal_models.UserWithBookList'
+      security:
+      - ApiKeyAuth: []
+      summary: get user list with books
+      tags:
+      - user
+swagger: "2.0"

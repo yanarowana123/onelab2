@@ -8,6 +8,13 @@ import (
 	"net/http"
 )
 
+// CreateBook
+// @Summary create book
+// @Description create book
+// @Tags book
+// @Param book body models.CreateBookRequest true "body"
+// @Success 200 {object} models.BookResponse
+// @Router /book [post]
 func (h *Manager) CreateBook() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -15,24 +22,20 @@ func (h *Manager) CreateBook() http.HandlerFunc {
 		var createBookRequest models.CreateBookRequest
 		err := json.NewDecoder(r.Body).Decode(&createBookRequest)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(models.ErrorCustom{Msg: err.Error()})
+			h.respondWithError(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		err = h.validate.Struct(createBookRequest)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			errors := models.NewErrorsCustomFromValidationErrors(err)
-			json.NewEncoder(w).Encode(errors)
+			h.respondWithErrorList(w, http.StatusBadRequest, err)
 			return
 		}
 
 		ctx := r.Context()
 		bookResponse, err := h.service.Book.Create(ctx, createBookRequest)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(models.ErrorCustom{Msg: err.Error()})
+			h.respondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
@@ -41,6 +44,15 @@ func (h *Manager) CreateBook() http.HandlerFunc {
 	}
 }
 
+// GetBookByID
+// @Summary get book by id
+// @Description get book by id
+// @Tags book
+// @Param bookID path string true "Book ID (UUID format)"
+// @Security ApiKeyAuth
+// @Success 200 {object} models.BookResponse
+// @Failure 404 "book not found"
+// @Router /book/{bookID} [get]
 func (h *Manager) GetBookByID() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -49,16 +61,14 @@ func (h *Manager) GetBookByID() http.HandlerFunc {
 		bookID, err := uuid.Parse(params["bookID"])
 
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(models.ErrorCustom{Msg: err.Error()})
+			h.respondWithError(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
 		ctx := r.Context()
 		bookResponse, err := h.service.Book.GetByID(ctx, bookID)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(models.ErrorCustom{Msg: err.Error()})
+			h.respondWithError(w, http.StatusNotFound, err.Error())
 			return
 		}
 

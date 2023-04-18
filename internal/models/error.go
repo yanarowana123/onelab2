@@ -13,11 +13,7 @@ type ErrorsCustom struct {
 func NewErrorsCustomFromValidationErrors(err error) *ErrorsCustom {
 	var errors ErrorsCustom
 	for _, err := range err.(validator.ValidationErrors) {
-		errors.AddError(err.Error())
+		errors.Msg = append(errors.Msg, err.Error())
 	}
 	return &errors
-}
-
-func (m *ErrorsCustom) AddError(msg string) {
-	m.Msg = append(m.Msg, msg)
 }

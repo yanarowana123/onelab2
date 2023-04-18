@@ -7,7 +7,7 @@ import (
 )
 
 type CreateBookRequest struct {
-	ID       uuid.UUID
+	ID       uuid.UUID `json:"-"`
 	Name     string    `validate:"required" json:"name"`
 	AuthorID uuid.UUID `validate:"required" json:"author_id"`
 }

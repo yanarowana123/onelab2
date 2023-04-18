@@ -46,18 +46,6 @@ func TestMain(m *testing.M) {
 
 	router = mux.NewRouter()
 	router.HandleFunc("/signup", handlerManager.Register()).Methods("POST")
-	//r.HandleFunc("/login", h.LogMiddleware(h.Login())).Methods("POST")
-	//r.HandleFunc("/refresh", h.RefreshToken()).Methods("POST")
-	//
-	//r.HandleFunc("/user/{userID}", h.TokenValidateMiddleware(h.GetUserByID())).Methods("GET")
-	//r.HandleFunc("/users/books", h.TokenValidateMiddleware(h.PaginateMiddleware(h.GetUserListWithBooks()))).Methods("GET")
-	//r.HandleFunc("/users/book-quantity", h.TokenValidateMiddleware(h.PaginateMiddleware(h.GetUserListWithBooksQuantity()))).Methods("GET")
-	//
-	//r.HandleFunc("/book", h.TokenValidateMiddleware(h.CreateBook())).Methods("POST")
-	//r.HandleFunc("/book/{bookID}", h.TokenValidateMiddleware(h.GetBookByID())).Methods("GET")
-	//
-	//r.HandleFunc("/checkout/{bookID}", h.TokenValidateMiddleware(h.CheckOut())).Methods("POST")
-	//r.HandleFunc("/return/{bookID}", h.TokenValidateMiddleware(h.Return())).Methods("POST")
 	m.Run()
 }
 
