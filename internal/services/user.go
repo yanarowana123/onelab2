@@ -33,7 +33,29 @@ func (s *UserService) GetListWithBooksQuantity(ctx context.Context, page, pageSi
 }
 
 func (s *UserService) GetListWithBooks(ctx context.Context, page, pageSize int) (*models.UserWithBookList, error) {
-	return s.repository.User.GetListWithBooks(ctx, page, pageSize)
+	userWithBookList, err := s.repository.User.GetListWithBooks(ctx, page, pageSize)
+	if err != nil {
+		return nil, err
+	}
+
+	users := userWithBookList.Users
+
+	booksMoneySum := make(map[uuid.UUID]float64)
+	for _, userWithBook := range users {
+		books := userWithBook.Books
+
+		for i := range books {
+			if sum, ok := booksMoneySum[books[i].ID]; ok {
+				books[i].Sum = sum
+			} else {
+				//TODO handle exception
+				sum, err = s.repository.Transaction.GetSumByBookID(ctx, books[i].ID)
+				(&books[i]).Sum = sum
+				booksMoneySum[books[i].ID] = sum
+			}
+		}
+	}
+	return userWithBookList, nil
 }
 
 func (s *UserService) Create(ctx context.Context, user models.CreateUserRequest) (*models.UserResponse, error) {

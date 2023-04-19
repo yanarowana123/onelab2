@@ -32,8 +32,8 @@ type AuthUser struct {
 }
 
 type UserWithBook struct {
-	User  UserResponse   `json:"user"`
-	Books []BookResponse `json:"books"`
+	User  UserResponse               `json:"user"`
+	Books []BookResponseWithMoneySum `json:"books"`
 }
 type UserWithBookQuantity struct {
 	User  UserResponse `json:"user"`

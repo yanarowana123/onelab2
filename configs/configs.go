@@ -9,14 +9,17 @@ import (
 )
 
 type Config struct {
-	MySqlDSN              string
-	PgSqlDSN              string
-	WebServerPort         string
-	JWTAccessTokenSecret  string
-	JWTRefreshTokenSecret string
-	JWTAccessTokenTTL     time.Duration
-	JWTRefreshTokenTTL    time.Duration
-	GracefulTimeout       time.Duration
+	MySqlDSN               string
+	PgSqlDSN               string
+	WebServerPort          string
+	JWTAccessTokenSecret   string
+	JWTRefreshTokenSecret  string
+	JWTAccessTokenTTL      time.Duration
+	JWTRefreshTokenTTL     time.Duration
+	GracefulTimeout        time.Duration
+	TransactionBaseUrl     string
+	TransactionHTTPTimeout time.Duration
+	TransactionSecretKey   string
 }
 
 func New() (*Config, error) {
@@ -84,20 +87,38 @@ func New() (*Config, error) {
 		jwtRefreshTokenTTL = 1000
 	}
 
-	GracefulTimeOutString := os.Getenv("GRACEFUL_TIMEOUT")
-	GracefulTimeOut, _ := strconv.Atoi(GracefulTimeOutString)
-	if GracefulTimeOut == 0 {
-		GracefulTimeOut = 15
+	gracefulTimeOutString := os.Getenv("GRACEFUL_TIMEOUT")
+	gracefulTimeOut, _ := strconv.Atoi(gracefulTimeOutString)
+	if gracefulTimeOut == 0 {
+		gracefulTimeOut = 15
 	}
 
+	transactionBaseUrl := os.Getenv("TRANSACTION_BASE_URL")
+	if len(transactionBaseUrl) == 0 {
+		return nil, errors.New("please specify TRANSACTION_BASE_URL variable in env")
+	}
+
+	transactionHTTPTimeOutString := os.Getenv("TRANSACTION_HTTP_TIMEOUT")
+	transactionHTTPTimeOut, _ := strconv.Atoi(transactionHTTPTimeOutString)
+	if transactionHTTPTimeOut == 0 {
+		gracefulTimeOut = 15
+	}
+
+	transactionSecretKey := os.Getenv("TRANSACTION_SECRET_KEY")
+	if len(transactionSecretKey) == 0 {
+		return nil, errors.New("please specify TRANSACTION_SECRET_KEY variable in env")
+	}
 	return &Config{
-		MySqlDSN:              mySqlDSN,
-		PgSqlDSN:              pgSqlDSN,
-		WebServerPort:         webServerPort,
-		JWTAccessTokenSecret:  jwtAccessTokenSecret,
-		JWTRefreshTokenSecret: jwtRefreshTokenSecret,
-		JWTAccessTokenTTL:     time.Duration(jwtAccessTokenTTL) * time.Second,
-		JWTRefreshTokenTTL:    time.Duration(jwtRefreshTokenTTL) * time.Second,
-		GracefulTimeout:       time.Duration(GracefulTimeOut) * time.Second,
+		MySqlDSN:               mySqlDSN,
+		PgSqlDSN:               pgSqlDSN,
+		WebServerPort:          webServerPort,
+		JWTAccessTokenSecret:   jwtAccessTokenSecret,
+		JWTRefreshTokenSecret:  jwtRefreshTokenSecret,
+		JWTAccessTokenTTL:      time.Duration(jwtAccessTokenTTL) * time.Second,
+		JWTRefreshTokenTTL:     time.Duration(jwtRefreshTokenTTL) * time.Second,
+		GracefulTimeout:        time.Duration(gracefulTimeOut) * time.Second,
+		TransactionBaseUrl:     transactionBaseUrl,
+		TransactionHTTPTimeout: time.Duration(transactionHTTPTimeOut) * time.Second,
+		TransactionSecretKey:   transactionSecretKey,
 	}, nil
 }

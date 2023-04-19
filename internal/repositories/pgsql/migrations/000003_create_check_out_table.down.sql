@@ -1,1 +1,1 @@
-drop table if exists check_out
+drop table if exists checkout

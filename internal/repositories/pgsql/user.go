@@ -21,7 +21,7 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 
 func (r *UserRepository) GetListWithBooksQuantity(ctx context.Context, page, pageSize int, dateFrom time.Time) (*models.UserWithBookQuantityList, error) {
 	offset := pageSize * (page - 1)
-	rows, err := r.db.QueryContext(ctx, "SELECT u.id, u.email, u.first_name, u.last_name, u.created_at, COUNT(c.user_id)  FROM users u LEFT JOIN check_out c ON u.id = c.user_id AND c.checked_out_at >= $1 GROUP BY u.id, u.first_name, u.email, u.id, u.last_name, u.created_at, u.id, u.created_at ORDER BY u.created_at OFFSET $2 LIMIT $3",
+	rows, err := r.db.QueryContext(ctx, "SELECT u.id, u.email, u.first_name, u.last_name, u.created_at, COUNT(c.user_id)  FROM users u LEFT JOIN checkout c ON u.id = c.user_id AND c.checked_out_at >= $1 GROUP BY u.id, u.first_name, u.email, u.id, u.last_name, u.created_at, u.id, u.created_at ORDER BY u.created_at OFFSET $2 LIMIT $3",
 		dateFrom, offset, pageSize)
 
 	if err != nil {
@@ -48,7 +48,7 @@ func (r *UserRepository) GetListWithBooksQuantity(ctx context.Context, page, pag
 
 func (r *UserRepository) GetListWithBooks(ctx context.Context, page, pageSize int) (*models.UserWithBookList, error) {
 	offset := pageSize * (page - 1)
-	rows, err := r.db.QueryContext(ctx, "SELECT u.id, u.email, u.first_name, u.last_name, u.created_at, b.id, b.name, b.author_id, b.created_at  FROM users u LEFT JOIN check_out c ON u.id = c.user_id AND c.returned_at IS NULL LEFT JOIN books b ON c.book_id = b.id ORDER BY u.created_at OFFSET $1 LIMIT $2",
+	rows, err := r.db.QueryContext(ctx, "SELECT u.id, u.email, u.first_name, u.last_name, u.created_at, b.id, b.name, b.author_id, b.created_at  FROM users u LEFT JOIN checkout c ON u.id = c.user_id AND c.returned_at IS NULL LEFT JOIN books b ON c.book_id = b.id ORDER BY u.created_at OFFSET $1 LIMIT $2",
 		offset, pageSize)
 
 	if err != nil {
@@ -59,12 +59,12 @@ func (r *UserRepository) GetListWithBooks(ctx context.Context, page, pageSize in
 
 	var userWithBookList []models.UserWithBook
 
-	userBookMap := make(map[models.UserResponse][]models.BookResponse)
+	userBookMap := make(map[models.UserResponse][]models.BookResponseWithMoneySum)
 
 	for rows.Next() {
 		var nullableBook models.NullableBook
 		var user models.UserResponse
-		var book models.BookResponse
+		var book models.BookResponseWithMoneySum
 		err = rows.Scan(
 			&user.ID,
 			&user.Email,
@@ -87,7 +87,7 @@ func (r *UserRepository) GetListWithBooks(ctx context.Context, page, pageSize in
 			book.CreatedAt = nullableBook.CreatedAt.Time
 			userBookMap[user] = append(userBookMap[user], book)
 		} else {
-			userBookMap[user] = []models.BookResponse{}
+			userBookMap[user] = []models.BookResponseWithMoneySum{}
 		}
 	}
 

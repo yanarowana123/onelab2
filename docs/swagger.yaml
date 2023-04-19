@@ -20,6 +20,19 @@ definitions:
       name:
         type: string
     type: object
+  github_com_yanarowana123_onelab2_internal_models.BookResponseWithMoneySum:
+    properties:
+      author_id:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      sum:
+        type: number
+    type: object
   github_com_yanarowana123_onelab2_internal_models.CreateBookRequest:
     properties:
       author_id:
@@ -29,6 +42,16 @@ definitions:
     required:
     - author_id
     - name
+    type: object
+  github_com_yanarowana123_onelab2_internal_models.CreateCheckoutRequest:
+    properties:
+      book_id:
+        type: string
+      money_amount:
+        type: number
+    required:
+    - book_id
+    - money_amount
     type: object
   github_com_yanarowana123_onelab2_internal_models.CreateUserRequest:
     properties:
@@ -70,7 +93,7 @@ definitions:
     properties:
       books:
         items:
-          $ref: '#/definitions/github_com_yanarowana123_onelab2_internal_models.BookResponse'
+          $ref: '#/definitions/github_com_yanarowana123_onelab2_internal_models.BookResponseWithMoneySum'
         type: array
       user:
         $ref: '#/definitions/github_com_yanarowana123_onelab2_internal_models.UserResponse'
@@ -114,6 +137,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/github_com_yanarowana123_onelab2_internal_models.BookResponse'
+      security:
+      - ApiKeyAuth: []
       summary: create book
       tags:
       - book
@@ -138,15 +163,16 @@ paths:
       summary: get book by id
       tags:
       - book
-  /checkout/{bookID}:
+  /checkout:
     post:
       description: checkout book
       parameters:
-      - description: Book ID (UUID format)
-        in: path
-        name: bookID
+      - description: body
+        in: body
+        name: checkout
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/github_com_yanarowana123_onelab2_internal_models.CreateCheckoutRequest'
       responses:
         "204":
           description: No Content
@@ -158,7 +184,7 @@ paths:
       - ApiKeyAuth: []
       summary: checkout book
       tags:
-      - checkOut
+      - checkout
   /login:
     post:
       description: log-in to system
@@ -195,7 +221,7 @@ paths:
       - ApiKeyAuth: []
       summary: return book
       tags:
-      - checkOut
+      - checkout
   /signup:
     post:
       description: Registration
@@ -281,4 +307,9 @@ paths:
       summary: get user list with books
       tags:
       - user
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

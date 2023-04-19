@@ -13,6 +13,7 @@ import (
 // @Description create book
 // @Tags book
 // @Param book body models.CreateBookRequest true "body"
+// @Security ApiKeyAuth
 // @Success 200 {object} models.BookResponse
 // @Router /book [post]
 func (h *Manager) CreateBook() http.HandlerFunc {

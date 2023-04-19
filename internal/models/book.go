@@ -19,6 +19,13 @@ type BookResponse struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type BookResponseWithMoneySum struct {
+	ID        uuid.UUID `json:"id"`
+	Name      string    `json:"name"`
+	AuthorID  uuid.UUID `json:"author_id"`
+	CreatedAt time.Time `json:"created_at"`
+	Sum       float64   `json:"sum"`
+}
 type NullableBook struct {
 	ID        sql.NullString
 	Name      sql.NullString

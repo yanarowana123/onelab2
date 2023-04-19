@@ -17,6 +17,6 @@ func NewManager(repository repositories.Manager, config configs.Config) *Manager
 	userService := NewUserService(repository, utilsService)
 	bookService := NewBookService(repository, utilsService)
 	authService := NewAuthService(config.JWTAccessTokenSecret, config.JWTRefreshTokenSecret, config.JWTAccessTokenTTL, config.JWTRefreshTokenTTL)
-	checkOutService := NewCheckOutService(repository)
+	checkOutService := NewCheckOutService(repository, utilsService)
 	return &Manager{User: userService, Book: bookService, Auth: authService, CheckOut: checkOutService}
 }

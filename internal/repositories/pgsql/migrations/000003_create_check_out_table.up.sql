@@ -1,5 +1,6 @@
-CREATE TABLE IF NOT EXISTS check_out
+CREATE TABLE IF NOT EXISTS checkout
 (
+    id uuid not null,
     user_id uuid not null,
     book_id uuid not null,
     checked_out_at timestamp default now(),

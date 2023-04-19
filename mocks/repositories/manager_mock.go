@@ -189,7 +189,7 @@ func (m *MockICheckOutRepository) EXPECT() *MockICheckOutRepositoryMockRecorder 
 }
 
 // CheckOut mocks base method.
-func (m *MockICheckOutRepository) CheckOut(ctx context.Context, checkOut models.CreateCheckOutRequest) error {
+func (m *MockICheckOutRepository) CheckOut(ctx context.Context, checkOut models.CreateCheckoutRequest) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CheckOut", ctx, checkOut)
 	ret0, _ := ret[0].(error)
@@ -203,7 +203,7 @@ func (mr *MockICheckOutRepositoryMockRecorder) CheckOut(ctx, checkOut interface{
 }
 
 // HasUserReturnedBook mocks base method.
-func (m *MockICheckOutRepository) HasUserReturnedBook(ctx context.Context, checkOut models.CreateCheckOutRequest) bool {
+func (m *MockICheckOutRepository) HasUserReturnedBook(ctx context.Context, checkOut models.CreateCheckoutRequest) bool {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "HasUserReturnedBook", ctx, checkOut)
 	ret0, _ := ret[0].(bool)
@@ -217,7 +217,7 @@ func (mr *MockICheckOutRepositoryMockRecorder) HasUserReturnedBook(ctx, checkOut
 }
 
 // Return mocks base method.
-func (m *MockICheckOutRepository) Return(ctx context.Context, checkOut models.CreateCheckOutRequest) error {
+func (m *MockICheckOutRepository) Return(ctx context.Context, checkOut models.CreateCheckoutRequest) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Return", ctx, checkOut)
 	ret0, _ := ret[0].(error)

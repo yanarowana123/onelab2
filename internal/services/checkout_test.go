@@ -12,7 +12,7 @@ import (
 func TestCheckOutService_CheckOut(t *testing.T) {
 	type args struct {
 		ctx      context.Context
-		checkOut models.CreateCheckOutRequest
+		checkOut models.CreateCheckoutRequest
 	}
 	tests := []struct {
 		name         string
@@ -24,7 +24,7 @@ func TestCheckOutService_CheckOut(t *testing.T) {
 			name: "book checked out successfully",
 			args: args{
 				ctx:      context.Background(),
-				checkOut: models.CreateCheckOutRequest{},
+				checkOut: models.CreateCheckoutRequest{},
 			},
 			prepareRepos: func(repo *mock_repositories.MockICheckOutRepository) {
 				repo.EXPECT().HasUserReturnedBook(gomock.Any(), gomock.Any()).Return(true)
@@ -36,7 +36,7 @@ func TestCheckOutService_CheckOut(t *testing.T) {
 			name: "cant check out the book because it is already checked out",
 			args: args{
 				ctx:      context.Background(),
-				checkOut: models.CreateCheckOutRequest{},
+				checkOut: models.CreateCheckoutRequest{},
 			},
 			prepareRepos: func(repo *mock_repositories.MockICheckOutRepository) {
 				repo.EXPECT().HasUserReturnedBook(gomock.Any(), gomock.Any()).Return(false)

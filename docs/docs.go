@@ -18,6 +18,11 @@ const docTemplate = `{
     "paths": {
         "/book": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "create book",
                 "tags": [
                     "book"
@@ -78,7 +83,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/checkout/{bookID}": {
+        "/checkout": {
             "post": {
                 "security": [
                     {
@@ -87,16 +92,18 @@ const docTemplate = `{
                 ],
                 "description": "checkout book",
                 "tags": [
-                    "checkOut"
+                    "checkout"
                 ],
                 "summary": "checkout book",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Book ID (UUID format)",
-                        "name": "bookID",
-                        "in": "path",
-                        "required": true
+                        "description": "body",
+                        "name": "checkout",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_yanarowana123_onelab2_internal_models.CreateCheckoutRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -149,7 +156,7 @@ const docTemplate = `{
                 ],
                 "description": "return book",
                 "tags": [
-                    "checkOut"
+                    "checkout"
                 ],
                 "summary": "return book",
                 "parameters": [
@@ -342,6 +349,26 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_yanarowana123_onelab2_internal_models.BookResponseWithMoneySum": {
+            "type": "object",
+            "properties": {
+                "author_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sum": {
+                    "type": "number"
+                }
+            }
+        },
         "github_com_yanarowana123_onelab2_internal_models.CreateBookRequest": {
             "type": "object",
             "required": [
@@ -354,6 +381,21 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "github_com_yanarowana123_onelab2_internal_models.CreateCheckoutRequest": {
+            "type": "object",
+            "required": [
+                "book_id",
+                "money_amount"
+            ],
+            "properties": {
+                "book_id": {
+                    "type": "string"
+                },
+                "money_amount": {
+                    "type": "number"
                 }
             }
         },
@@ -417,7 +459,7 @@ const docTemplate = `{
                 "books": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_yanarowana123_onelab2_internal_models.BookResponse"
+                        "$ref": "#/definitions/github_com_yanarowana123_onelab2_internal_models.BookResponseWithMoneySum"
                     }
                 },
                 "user": {
@@ -457,6 +499,13 @@ const docTemplate = `{
                     }
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

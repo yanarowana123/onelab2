@@ -2,9 +2,7 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/yanarowana123/onelab2/internal/models"
 	"net/http"
 	"strconv"
 	"strings"
@@ -27,16 +25,14 @@ func (h *Manager) TokenValidateMiddleware(next http.HandlerFunc) http.HandlerFun
 			authToken := bearerToken[1]
 			token, err := jwt.Parse(authToken, func(token *jwt.Token) (interface{}, error) {
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-					w.WriteHeader(http.StatusUnauthorized)
-					json.NewEncoder(w).Encode(models.ErrorCustom{Msg: "Unauthorized"})
+					h.respondWithError(w, http.StatusUnauthorized, "Unauthorized")
 				}
 
 				return []byte(h.service.Auth.GetAccessTokenSecret()), nil
 			})
 
 			if err != nil {
-				w.WriteHeader(http.StatusUnauthorized)
-				json.NewEncoder(w).Encode(models.ErrorCustom{Msg: err.Error()})
+				h.respondWithError(w, http.StatusUnauthorized, err.Error())
 				return
 			}
 
@@ -46,14 +42,12 @@ func (h *Manager) TokenValidateMiddleware(next http.HandlerFunc) http.HandlerFun
 				next.ServeHTTP(w, r.WithContext(ctx))
 				return
 			} else {
-				w.WriteHeader(http.StatusUnauthorized)
-				json.NewEncoder(w).Encode(models.ErrorCustom{Msg: err.Error()})
+				h.respondWithError(w, http.StatusUnauthorized, err.Error())
 				return
 			}
 		}
 
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(models.ErrorCustom{Msg: "Invalid Token"})
+		h.respondWithError(w, http.StatusUnauthorized, "Invalid Token")
 		return
 	}
 }

@@ -6,6 +6,11 @@
     "paths": {
         "/book": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "create book",
                 "tags": [
                     "book"
@@ -66,7 +71,7 @@
                 }
             }
         },
-        "/checkout/{bookID}": {
+        "/checkout": {
             "post": {
                 "security": [
                     {
@@ -75,16 +80,18 @@
                 ],
                 "description": "checkout book",
                 "tags": [
-                    "checkOut"
+                    "checkout"
                 ],
                 "summary": "checkout book",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Book ID (UUID format)",
-                        "name": "bookID",
-                        "in": "path",
-                        "required": true
+                        "description": "body",
+                        "name": "checkout",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_yanarowana123_onelab2_internal_models.CreateCheckoutRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -137,7 +144,7 @@
                 ],
                 "description": "return book",
                 "tags": [
-                    "checkOut"
+                    "checkout"
                 ],
                 "summary": "return book",
                 "parameters": [
@@ -330,6 +337,26 @@
                 }
             }
         },
+        "github_com_yanarowana123_onelab2_internal_models.BookResponseWithMoneySum": {
+            "type": "object",
+            "properties": {
+                "author_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sum": {
+                    "type": "number"
+                }
+            }
+        },
         "github_com_yanarowana123_onelab2_internal_models.CreateBookRequest": {
             "type": "object",
             "required": [
@@ -342,6 +369,21 @@
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "github_com_yanarowana123_onelab2_internal_models.CreateCheckoutRequest": {
+            "type": "object",
+            "required": [
+                "book_id",
+                "money_amount"
+            ],
+            "properties": {
+                "book_id": {
+                    "type": "string"
+                },
+                "money_amount": {
+                    "type": "number"
                 }
             }
         },
@@ -405,7 +447,7 @@
                 "books": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_yanarowana123_onelab2_internal_models.BookResponse"
+                        "$ref": "#/definitions/github_com_yanarowana123_onelab2_internal_models.BookResponseWithMoneySum"
                     }
                 },
                 "user": {
@@ -445,6 +487,13 @@
                     }
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }
