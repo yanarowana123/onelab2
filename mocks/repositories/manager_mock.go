@@ -165,45 +165,45 @@ func (mr *MockIBookRepositoryMockRecorder) GetByID(ctx, ID interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockIBookRepository)(nil).GetByID), ctx, ID)
 }
 
-// MockICheckOutRepository is a mock of ICheckOutRepository interface.
-type MockICheckOutRepository struct {
+// MockICheckoutRepository is a mock of ICheckoutRepository interface.
+type MockICheckoutRepository struct {
 	ctrl     *gomock.Controller
-	recorder *MockICheckOutRepositoryMockRecorder
+	recorder *MockICheckoutRepositoryMockRecorder
 }
 
-// MockICheckOutRepositoryMockRecorder is the mock recorder for MockICheckOutRepository.
-type MockICheckOutRepositoryMockRecorder struct {
-	mock *MockICheckOutRepository
+// MockICheckoutRepositoryMockRecorder is the mock recorder for MockICheckoutRepository.
+type MockICheckoutRepositoryMockRecorder struct {
+	mock *MockICheckoutRepository
 }
 
-// NewMockICheckOutRepository creates a new mock instance.
-func NewMockICheckOutRepository(ctrl *gomock.Controller) *MockICheckOutRepository {
-	mock := &MockICheckOutRepository{ctrl: ctrl}
-	mock.recorder = &MockICheckOutRepositoryMockRecorder{mock}
+// NewMockICheckoutRepository creates a new mock instance.
+func NewMockICheckoutRepository(ctrl *gomock.Controller) *MockICheckoutRepository {
+	mock := &MockICheckoutRepository{ctrl: ctrl}
+	mock.recorder = &MockICheckoutRepositoryMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockICheckOutRepository) EXPECT() *MockICheckOutRepositoryMockRecorder {
+func (m *MockICheckoutRepository) EXPECT() *MockICheckoutRepositoryMockRecorder {
 	return m.recorder
 }
 
 // CheckOut mocks base method.
-func (m *MockICheckOutRepository) CheckOut(ctx context.Context, checkOut models.CreateCheckoutRequest) error {
+func (m *MockICheckoutRepository) CheckOut(ctx context.Context, checkout models.CreateCheckoutRequest) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CheckOut", ctx, checkOut)
+	ret := m.ctrl.Call(m, "CheckOut", ctx, checkout)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CheckOut indicates an expected call of CheckOut.
-func (mr *MockICheckOutRepositoryMockRecorder) CheckOut(ctx, checkOut interface{}) *gomock.Call {
+func (mr *MockICheckoutRepositoryMockRecorder) CheckOut(ctx, checkout interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckOut", reflect.TypeOf((*MockICheckOutRepository)(nil).CheckOut), ctx, checkOut)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckOut", reflect.TypeOf((*MockICheckoutRepository)(nil).CheckOut), ctx, checkout)
 }
 
 // HasUserReturnedBook mocks base method.
-func (m *MockICheckOutRepository) HasUserReturnedBook(ctx context.Context, checkOut models.CreateCheckoutRequest) bool {
+func (m *MockICheckoutRepository) HasUserReturnedBook(ctx context.Context, checkOut models.CreateCheckoutRequest) bool {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "HasUserReturnedBook", ctx, checkOut)
 	ret0, _ := ret[0].(bool)
@@ -211,21 +211,73 @@ func (m *MockICheckOutRepository) HasUserReturnedBook(ctx context.Context, check
 }
 
 // HasUserReturnedBook indicates an expected call of HasUserReturnedBook.
-func (mr *MockICheckOutRepositoryMockRecorder) HasUserReturnedBook(ctx, checkOut interface{}) *gomock.Call {
+func (mr *MockICheckoutRepositoryMockRecorder) HasUserReturnedBook(ctx, checkOut interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HasUserReturnedBook", reflect.TypeOf((*MockICheckOutRepository)(nil).HasUserReturnedBook), ctx, checkOut)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HasUserReturnedBook", reflect.TypeOf((*MockICheckoutRepository)(nil).HasUserReturnedBook), ctx, checkOut)
 }
 
 // Return mocks base method.
-func (m *MockICheckOutRepository) Return(ctx context.Context, checkOut models.CreateCheckoutRequest) error {
+func (m *MockICheckoutRepository) Return(ctx context.Context, returnBookRequest models.ReturnBookRequest) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Return", ctx, checkOut)
+	ret := m.ctrl.Call(m, "Return", ctx, returnBookRequest)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Return indicates an expected call of Return.
-func (mr *MockICheckOutRepositoryMockRecorder) Return(ctx, checkOut interface{}) *gomock.Call {
+func (mr *MockICheckoutRepositoryMockRecorder) Return(ctx, returnBookRequest interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Return", reflect.TypeOf((*MockICheckOutRepository)(nil).Return), ctx, checkOut)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Return", reflect.TypeOf((*MockICheckoutRepository)(nil).Return), ctx, returnBookRequest)
+}
+
+// MockITransactionRepository is a mock of ITransactionRepository interface.
+type MockITransactionRepository struct {
+	ctrl     *gomock.Controller
+	recorder *MockITransactionRepositoryMockRecorder
+}
+
+// MockITransactionRepositoryMockRecorder is the mock recorder for MockITransactionRepository.
+type MockITransactionRepositoryMockRecorder struct {
+	mock *MockITransactionRepository
+}
+
+// NewMockITransactionRepository creates a new mock instance.
+func NewMockITransactionRepository(ctrl *gomock.Controller) *MockITransactionRepository {
+	mock := &MockITransactionRepository{ctrl: ctrl}
+	mock.recorder = &MockITransactionRepositoryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockITransactionRepository) EXPECT() *MockITransactionRepositoryMockRecorder {
+	return m.recorder
+}
+
+// Create mocks base method.
+func (m *MockITransactionRepository) Create(ctx context.Context, createTransactionRequest models.CreateTransactionRequest) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", ctx, createTransactionRequest)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Create indicates an expected call of Create.
+func (mr *MockITransactionRepositoryMockRecorder) Create(ctx, createTransactionRequest interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockITransactionRepository)(nil).Create), ctx, createTransactionRequest)
+}
+
+// GetSumByBookID mocks base method.
+func (m *MockITransactionRepository) GetSumByBookID(ctx context.Context, bookID uuid.UUID) (float64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSumByBookID", ctx, bookID)
+	ret0, _ := ret[0].(float64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSumByBookID indicates an expected call of GetSumByBookID.
+func (mr *MockITransactionRepositoryMockRecorder) GetSumByBookID(ctx, bookID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSumByBookID", reflect.TypeOf((*MockITransactionRepository)(nil).GetSumByBookID), ctx, bookID)
 }
